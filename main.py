@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Config
-EXCEL_PATH = os.getenv("EXCEL_PATH", r"C:\Users\henvi\OneDrive\Documents\Details of replaced PCs & Printers.xlsx")
+EXCEL_PATH = "/home/ubuntu/apsrtc/Details of replaced PCs & Printers.xlsx"
 RELOAD_INTERVAL = 60  # seconds
 
 # Globals
@@ -129,5 +129,5 @@ async def health():
 # Run locally
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
