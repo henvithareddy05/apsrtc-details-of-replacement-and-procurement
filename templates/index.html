@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-image: url('{{ url_for('static', path='backgroud.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white overlay */
+            z-index: -1;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-container img {
+            width: 150px;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        form {
+            display: inline-block;
+        }
+
+        input[type="text"] {
+            padding: 0.5rem;
+            width: 300px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-btn {
+            background-color: #28a745;
+        }
+
+        .search-btn:hover {
+            background-color: #218838;
+        }
+
+        .refresh-btn {
+            background-color: #007bff;
+        }
+
+        .refresh-btn:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.6rem;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .no-results {
+            color: red;
+            text-align: center;
+        }
+
+        .autocomplete-suggestions {
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            position: absolute;
+            z-index: 999;
+            width: 300px;
+        }
+
+        .autocomplete-suggestions div {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- PNG Logo Above Heading -->
+<div class="logo-container">
+    <img src="{{ url_for('static', path='apsrtc logo.webp') }}" alt="APSRTC Logo">
+</div>
+
+<h1>Details of replacement and procurement</h1>
+
+<div class="form-container">
+    <form method="post" action="/search">
+        <div style="position: relative;">
+            <input type="text" id="unitInput" name="unit" placeholder="Enter Unit" required autocomplete="off" value="{{ search_term | default('') }}">
+            <div id="suggestions" class="autocomplete-suggestions"></div>
+        </div>
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+
+    <form method="get" action="/refresh">
+        <button type="submit" class="refresh-btn">Refresh Data</button>
+    </form>
+</div>
+
+{% if error_message %}
+    <p class="no-results">{{ error_message }}</p>
+{% endif %}
+
+{% if search_performed %}
+    {% if results %}
+        <table>
+            <thead>
+                <tr>
+                    {% for key in results[0].keys() %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                    <tr>
+                        {% for value in item.values() %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-results">No results found for "{{ search_term }}".</p>
+    {% endif %}
+{% endif %}
+
+<script>
+    const input = document.getElementById("unitInput");
+    const suggestionsBox = document.getElementById("suggestions");
+
+    input.addEventListener("input", async () => {
+        const query = input.value.trim();
+        if (query.length === 0) {
+            suggestionsBox.innerHTML = "";
+            return;
+        }
+
+        const res = await fetch(`/suggest?query=${encodeURIComponent(query)}`);
+        const units = await res.json();
+
+        suggestionsBox.innerHTML = "";
+        units.forEach(unit => {
+            const div = document.createElement("div");
+            div.textContent = unit;
+            div.onclick = () => {
+                input.value = unit;
+                suggestionsBox.innerHTML = "";
+            };
+            suggestionsBox.appendChild(div);
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!suggestionsBox.contains(e.target) && e.target !== input) {
+            suggestionsBox.innerHTML = "";
+        }
+    });
+</script>
+
+</body>
+</html>

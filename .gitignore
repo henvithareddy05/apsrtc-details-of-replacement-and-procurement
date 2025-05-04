@@ -1,0 +1,41 @@
+# Python Bytecode files
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+.env/
+
+# IDE and editor specific files
+.vscode/
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database files (if using SQLite or others)
+*.sqlite3
+
+# Dependency directories (if using poetry or pipenv)
+poetry.lock
+Pipfile.lock
+
+# FastAPI specific files
+*.db
+
+# Static files (if any are dynamically generated or not necessary in the repo)
+static/
+
+# Configuration files that might contain sensitive data
+config.json
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Temporary files
+*.swp
